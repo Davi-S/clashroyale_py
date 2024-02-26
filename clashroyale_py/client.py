@@ -4,10 +4,10 @@ from urllib.parse import urlencode
 
 import requests
 
-import cache
-import errors
-import models
-import utils
+from . import cache
+from . import errors
+from . import models
+from . import utils
 
 # The content of the response to the url, if the content came from the cache, when was the response last updated
 type InfoFromURL = tuple[dict, bool, datetime]

@@ -1,4 +1,3 @@
-from cache import SqliteCacheStorage
 from client import Client
 import time
 
