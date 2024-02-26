@@ -1,3 +1,3 @@
-from client import Client
-from cache import CacheStorage, SqliteCacheStorage
-from errors import *
+from .client import Client
+from .cache import CacheStorage, SqliteCacheStorage
+from .errors import *
