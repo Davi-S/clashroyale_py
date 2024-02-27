@@ -48,12 +48,12 @@ class BaseAttrDict:
     def __getitem__(self, item):
         try:
             return getattr(self._boxed_data, item)
-        except AttributeError:
-            raise KeyError('No such key: {}'.format(item))
+        except AttributeError as e:
+            raise KeyError(f'No such key: {item}') from e
 
     def __repr__(self):
         _type = self.__class__.__name__
-        return "<{}: {}>".format(_type, self.raw_data)
+        return f"<{_type}: {self.raw_data}>"
 
 
 class PaginatedAttrDict(BaseAttrDict):
@@ -83,15 +83,13 @@ class PaginatedAttrDict(BaseAttrDict):
     def __getitem__(self, item):
         try:
             return self.raw_data[item]
-        except AttributeError:
-            raise KeyError('No such key: {}'.format(item))
+        except AttributeError as e:
+            raise KeyError(f'No such key: {item}') from e
 
     def __iter__(self):
         while True:
-            index = 0
-            for _ in range(index, len(self.raw_data)):
+            for index, _ in enumerate(range(index, len(self.raw_data))):
                 yield self.raw_data[index]
-                index += 1
             if not self.update_data():
                 break
 
@@ -142,8 +140,8 @@ class PartialClan(BaseAttrDict):
         except AttributeError:
             try:
                 return self.client.get_clan(self.tag)
-            except AttributeError:
-                raise ValueError('This player does not have a clan.')
+            except AttributeError as e:
+                raise ValueError('This player does not have a clan.') from e
 
 
 class PartialTournament(BaseAttrDict):
@@ -202,4 +200,4 @@ class RefreshableList(list, Refreshable):
 
     @property
     def url(self):
-        return '{}/endpoints'.format(self.client.api.BASE)
+        return f'{self.client.api.BASE}/endpoints'

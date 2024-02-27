@@ -6,11 +6,11 @@ with open('requirements.txt') as f:
 
 setup(
     name='clashroyale_py',
-    version='1.1.0',
+    version='1.2.0',
     url='https://github.com/Davi-S/clashroyale_py',
     author='Davi Sampaio',
     author_email='davialvessampaio00@gmail.com',
     description='A python wrapper for the Clash Royale Official API',
-    packages=find_packages(),    
+    packages=['clashroyale_py'],    
     install_requires=requirements,
 )

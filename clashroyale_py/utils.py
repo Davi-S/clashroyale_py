@@ -12,7 +12,7 @@ def normalize_tag(tag: str):
         raise ValueError(f'Tag ({tag}) too short, expected min length 3')
     # Prepare for url
     if not tag.startswith('%23'):
-        tag = '%23' + tag
+        tag = f'%23{tag}'
     return tag
 
 

@@ -1,7 +1,7 @@
 import abc
 import json
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class CacheStorage(abc.ABC):
@@ -37,14 +37,14 @@ class SqliteCacheStorage(CacheStorage):
     Cache storage implementation using SQLite3.
     """
     
-    def __init__(self, db_path="cache.db", expiration_time_in_minutes: int = 1):
+    def __init__(self, db_path="cache.db", expiration_time: timedelta = timedelta(hours=1)):
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
         self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT, timestamp FLOAT)"
         )
         self.connection.commit()
-        self.expiration_time = timedelta(minutes=expiration_time_in_minutes)
+        self.expiration_time = expiration_time
 
     @property
     def expiration_time(self):
@@ -73,10 +73,9 @@ class SqliteCacheStorage(CacheStorage):
         Reads the value and timestamp associated with a key from the cache.
         """
         self.cursor.execute("SELECT value, timestamp FROM cache WHERE key = ?", (key,))
-        row = self.cursor.fetchone()
-        if row:
+        if row := self.cursor.fetchone():
             # Check for expiration
-            if (datetime.fromtimestamp(row[1]) + self.expiration_time) > datetime.utcnow():  
+            if datetime.fromtimestamp(row[1]) + self.expiration_time > datetime.now(timezone.utc):  
                 value = json.loads(row[0])
                 timestamp = datetime.fromtimestamp(row[1])
                 return value, timestamp

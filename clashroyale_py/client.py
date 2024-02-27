@@ -1,5 +1,5 @@
 import typing as t
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 import requests
@@ -30,8 +30,8 @@ class Client:
     ) -> None:
         self.token = token
         self.headers = {
-            'Authorization': 'Bearer {}'.format(self.token),
-            'User-Agent': 'python-clashroyale-client (fourjr/kyb3r) '
+            'Authorization': f'Bearer {self.token}',
+            'User-Agent': 'python-clashroyale-client (fourjr/kyb3r) ',
         }
         self.timeout = timeout
         self.cache = cache_storage
@@ -81,7 +81,7 @@ class Client:
         # Cache miss or not enabled, fetch from request
         data = self._request(method, url, timeout, json)
         is_from_cache = False
-        timestamp = datetime.utcnow()
+        timestamp = datetime.now(timezone.utc)
 
         # Optionally save request to cache (if enabled)
         if self.cache and isinstance(cache_exception, KeyError):
@@ -109,24 +109,26 @@ class Client:
         if isinstance(data, str):
             # version endpoint, not feasible to add refresh functionality.
             return data
-        if isinstance(data, list):  # extra functionality
-            if all(isinstance(x, str) for x in data):  # endpoints endpoint
-                # extra functionality
-                return models.RefreshableList(self, data, is_from_cache, timestamp, response)
-            return [model(self, d, response, cached=is_from_cache, ts=timestamp) for d in data]
-        else:
-            if 'items' in data:
-                if data.get('paging'):
-                    return models.PaginatedAttrDict(self, data, response, model, cached=is_from_cache, ts=timestamp)
-                return self._get_model(
-                    model=model,
-                    data=data['items'],
-                    is_from_cache=is_from_cache,
-                    timestamp=timestamp
-                )
-            else:
-                return model(self, data, response, cached=is_from_cache, ts=timestamp)
-
+        if isinstance(data, list):
+            return (
+                models.RefreshableList(self, data, is_from_cache, timestamp, response)
+                if all(isinstance(x, str) for x in data)
+                else [
+                    model(self, d, response, cached=is_from_cache, ts=timestamp)
+                    for d in data
+                ]
+            )
+        if 'items' not in data:
+            return model(self, data, response, cached=is_from_cache, ts=timestamp)
+        if data.get('paging'):
+            return models.PaginatedAttrDict(self, data, response, model, cached=is_from_cache, ts=timestamp)
+        return self._get_model(
+            model=model,
+            data=data['items'],
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+        
     #################
     ### ENDPOINTS ###
     #################
