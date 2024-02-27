@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='clashroyale_py',
-    version='1.0.0',
+    version='1.1.0',
     url='https://github.com/Davi-S/clashroyale_py',
     author='Davi Sampaio',
     author_email='davialvessampaio00@gmail.com',
