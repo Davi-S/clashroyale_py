@@ -292,3 +292,20 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
+    
+    def get_player_battle_log(
+        self,
+        tag: str,
+        timeout: t.Optional[int] = None
+    ):
+        tag = utils.normalize_tag(tag)
+        url = f'{self.api.PLAYER}/{tag}/battlelog'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
+        return self._get_model(
+            model=None,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
