@@ -87,41 +87,14 @@ class Client:
     def _get_model(
         self,
         *,
-        model,
-        data,
-        is_from_cache,
-        timestamp
-    ) -> models.BaseAttrDict | list[models.BaseAttrDict] | str:
-        # TODO: refactor this function
-        # TODO: Add dynamic return value based on the model parameter
-        response = None
-        if model is None and isinstance(data, list):
-            model = models.BaseAttrDict
-        else:
-            model = models.Refreshable
-
-        if isinstance(data, str):
-            # version endpoint, not feasible to add refresh functionality.
-            return data
-        if isinstance(data, list):
-            return (
-                models.RefreshableList(self, data, is_from_cache, timestamp, response)
-                if all(isinstance(x, str) for x in data)
-                else [
-                    model(self, d, response, cached=is_from_cache, ts=timestamp)
-                    for d in data
-                ]
-            )
-        if 'items' not in data:
-            return model(self, data, response, cached=is_from_cache, ts=timestamp)
-        if data.get('paging'):
-            return models.PaginatedAttrDict(self, data, response, model, cached=is_from_cache, ts=timestamp)
-        return self._get_model(
-            model=model,
-            data=data['items'],
-            is_from_cache=is_from_cache,
-            timestamp=timestamp
-        )
+        data: dict,
+        is_from_cache: bool,
+        timestamp: datetime
+    ) -> models.ClashRoyaleModel:
+        # Check for the "items" key when the API returns a list
+        if 'items' in data:
+            data = data.pop('items')
+        return models.ClashRoyaleModel(data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
 
     #################
     ### ENDPOINTS ###
@@ -162,7 +135,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=models.PartialClan,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -189,7 +161,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -207,7 +178,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=models.FullClan,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -234,7 +204,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -252,7 +221,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -274,7 +242,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=models.FullPlayer,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -292,7 +259,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -310,7 +276,6 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -339,8 +304,11 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
-            model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
+
+    #############################
+    ### TOURNAMENTS ENDPOINTS ###
+    #############################
