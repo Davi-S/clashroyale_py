@@ -128,11 +128,11 @@ class Client:
     #################
     ### ENDPOINTS ###
     #################
-    
+
     ######################
     ### CLAN ENDPOINTS ###
     ######################
-    
+
     # TODO: add return types to the endpoints
 
     def get_clans(
@@ -263,7 +263,7 @@ class Client:
     #########################
     ### PLAYERS ENDPOINTS ###
     #########################
-    
+
     def get_player(
         self,
         tag: str,
@@ -281,7 +281,7 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-        
+
     def get_player_upcoming_chests(
         self,
         tag: str,
@@ -299,7 +299,7 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-    
+
     def get_player_battle_log(
         self,
         tag: str,
@@ -308,6 +308,35 @@ class Client:
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/battlelog'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=force_request
+        )
+        return self._get_model(
+            model=None,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+
+    #######################
+    ### CARDS ENDPOINTS ###
+    #######################
+
+    def get_cards(
+        self,
+        limit: t.Optional[int] = None,
+        after: t.Optional[str] = None,
+        before: t.Optional[str] = None,
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
+    ):
+        params = {
+            'limit': limit,
+            'after': after,
+            'before': before
+        }
+        params = utils.filter_none_values(params)
+        url = f'{self.api.CARDS}?{urlencode(params)}'
         data, is_from_cache, timestamp = self._get_info_from_url(
             method='GET', url=url, timeout=timeout, force_request=force_request
         )
