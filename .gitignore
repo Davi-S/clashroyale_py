@@ -153,5 +153,5 @@ cython_debug/
 
 .vscode/
 *.secrets*
-src/cache.db
 Makefile
+clashroyale_py/test.py
