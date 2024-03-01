@@ -6,7 +6,7 @@ import requests
 
 from . import cache, errors, models, utils
 
-# The content of the response to the url, if the content came from the cache, when was the response last updated
+# (The content of the response to the url), (if the content came from the cache), (when was the response last updated)
 type InfoFromURL = tuple[dict, bool, datetime]
 
 
@@ -41,11 +41,10 @@ class Client:
     def _request(
         self,
         *,
-        method: str,
         url: str,
         timeout: t.Optional[int],
     ) -> dict:
-        with self.session.request(method, url, timeout=timeout or self.timeout) as response:
+        with self.session.request('GET', url, timeout=timeout or self.timeout) as response:
             self._verify_status_code(response.status_code)
             return response.json()
 
@@ -57,7 +56,6 @@ class Client:
     def _get_info_from_url(
         self,
         *,
-        method: str,
         url: str,
         timeout: t.Optional[int],
         force_request: bool,
@@ -75,7 +73,7 @@ class Client:
                 cache_exception = error
 
         # If there is a cache error or if it is not enabled, fetch from request
-        data = self._request(method=method, url=url, timeout=timeout)
+        data = self._request(url=url, timeout=timeout)
         is_from_cache = False
         timestamp = datetime.now(timezone.utc)
 
@@ -128,11 +126,11 @@ class Client:
     #################
     ### ENDPOINTS ###
     #################
-    
+
     ######################
     ### CLAN ENDPOINTS ###
     ######################
-    
+
     # TODO: add return types to the endpoints
 
     def get_clans(
@@ -161,7 +159,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}?{urlencode(params)}'  # with params
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.PartialClan,
@@ -188,7 +186,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}/{tag}/riverracelog?{urlencode(params)}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -206,7 +204,7 @@ class Client:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.FullClan,
@@ -233,7 +231,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}/{tag}/members?{urlencode(params)}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -251,7 +249,7 @@ class Client:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}/currentriverrace'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -263,7 +261,7 @@ class Client:
     #########################
     ### PLAYERS ENDPOINTS ###
     #########################
-    
+
     def get_player(
         self,
         tag: str,
@@ -273,7 +271,7 @@ class Client:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.FullPlayer,
@@ -281,7 +279,7 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-        
+
     def get_player_upcoming_chests(
         self,
         tag: str,
@@ -291,7 +289,7 @@ class Client:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/upcomingchests'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -299,7 +297,7 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-    
+
     def get_player_battle_log(
         self,
         tag: str,
@@ -309,7 +307,36 @@ class Client:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/battlelog'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=force_request
+            url=url, timeout=timeout, force_request=force_request
+        )
+        return self._get_model(
+            model=None,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+
+    #######################
+    ### CARDS ENDPOINTS ###
+    #######################
+
+    def get_cards(
+        self,
+        limit: t.Optional[int] = None,
+        after: t.Optional[str] = None,
+        before: t.Optional[str] = None,
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
+    ):
+        params = {
+            'limit': limit,
+            'after': after,
+            'before': before
+        }
+        params = utils.filter_none_values(params)
+        url = f'{self.api.CARDS}?{urlencode(params)}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
