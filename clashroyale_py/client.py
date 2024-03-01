@@ -4,13 +4,11 @@ from urllib.parse import urlencode
 
 import requests
 
-from . import cache
-from . import errors
-from . import models
-from . import utils
+from . import cache, errors, models, utils
 
 # The content of the response to the url, if the content came from the cache, when was the response last updated
 type InfoFromURL = tuple[dict, bool, datetime]
+
 
 class API:
     BASE = 'https://api.clashroyale.com/v1'
@@ -19,6 +17,7 @@ class API:
     TOURNAMENT = BASE + '/tournaments'
     CARDS = BASE + '/cards'
     LOCATIONS = BASE + '/locations'
+
 
 class Client:
     def __init__(
@@ -41,20 +40,15 @@ class Client:
 
     def _request(
         self,
+        *,
         method: str,
         url: str,
         timeout: t.Optional[int],
-        json: t.Optional[dict],
     ) -> dict:
-        with self.session.request(
-            method,
-            url,
-            timeout=timeout or self.timeout,
-            json=json
-        ) as response:
+        with self.session.request(method, url, timeout=timeout or self.timeout) as response:
             self._verify_status_code(response.status_code)
             return response.json()
-        
+
     def _verify_status_code(self, status_code: int) -> None:
         # TODO: check other status codes
         if status_code != 200:
@@ -62,14 +56,16 @@ class Client:
 
     def _get_info_from_url(
         self,
+        *,
         method: str,
         url: str,
         timeout: t.Optional[int],
-        json: t.Optional[dict],
+        force_request: bool,
     ) -> InfoFromURL:
         cache_exception = None
         # Attempt to get data from cache (if enabled)
-        if self.cache:
+        # if force_request is True, forces a request instead of using cache
+        if self.cache and not force_request:
             try:
                 data, timestamp = self.cache.read(url)
                 if data and timestamp:
@@ -78,13 +74,13 @@ class Client:
             except Exception as error:
                 cache_exception = error
 
-        # Cache miss or not enabled, fetch from request
-        data = self._request(method, url, timeout, json)
+        # If there is a cache error or if it is not enabled, fetch from request
+        data = self._request(method=method, url=url, timeout=timeout)
         is_from_cache = False
         timestamp = datetime.now(timezone.utc)
 
         # Optionally save request to cache (if enabled)
-        if self.cache and isinstance(cache_exception, KeyError):
+        if self.cache and isinstance(cache_exception, KeyError) and not force_request:
             # TODO: create or update depending on the cache error
             self.cache.create(url, data, timestamp)
 
@@ -128,7 +124,7 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-        
+
     #################
     ### ENDPOINTS ###
     #################
@@ -138,7 +134,7 @@ class Client:
     ######################
     
     # TODO: add return types to the endpoints
-    
+
     def get_clans(
         self,
         name: t.Optional[str] = None,
@@ -163,7 +159,9 @@ class Client:
         }
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}?{urlencode(params)}'  # with params
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=models.PartialClan,
             data=data,
@@ -186,15 +184,17 @@ class Client:
             'before': before
         }
         params = utils.filter_none_values(params)
-        url = f'{self.api.CLAN}/{tag}/riverracelog?{urlencode(params)}' # with params
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        url = f'{self.api.CLAN}/{tag}/riverracelog?{urlencode(params)}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-        
+
     def get_clan(
         self,
         tag: str,
@@ -202,7 +202,9 @@ class Client:
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}'
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=models.FullClan,
             data=data,
@@ -225,15 +227,17 @@ class Client:
             'before': before
         }
         params = utils.filter_none_values(params)
-        url = f'{self.api.CLAN}/{tag}/members?{urlencode(params)}' # with params
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        url = f'{self.api.CLAN}/{tag}/members?{urlencode(params)}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=None,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-        
+
     def get_clan_current_river_race(
         self,
         tag: str,
@@ -241,7 +245,9 @@ class Client:
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}/currentriverrace'
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=None,
             data=data,
