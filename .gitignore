@@ -154,4 +154,4 @@ cython_debug/
 .vscode/
 *.secrets*
 Makefile
-clashroyale_py/test.py
+test.py
