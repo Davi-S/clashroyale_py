@@ -145,7 +145,8 @@ class Client:
         limit: t.Optional[int] = None,
         after: t.Optional[str] = None,
         before: t.Optional[str] = None,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         params = {
             'name': name,
@@ -160,7 +161,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}?{urlencode(params)}'  # with params
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.PartialClan,
@@ -175,7 +176,8 @@ class Client:
         limit: t.Optional[int] = None,
         after: t.Optional[str] = None,
         before: t.Optional[str] = None,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         params = {
@@ -186,7 +188,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}/{tag}/riverracelog?{urlencode(params)}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -198,12 +200,13 @@ class Client:
     def get_clan(
         self,
         tag: str,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.FullClan,
@@ -218,7 +221,8 @@ class Client:
         limit: t.Optional[int] = None,
         after: t.Optional[str] = None,
         before: t.Optional[str] = None,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         params = {
@@ -229,7 +233,7 @@ class Client:
         params = utils.filter_none_values(params)
         url = f'{self.api.CLAN}/{tag}/members?{urlencode(params)}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -241,12 +245,13 @@ class Client:
     def get_clan_current_river_race(
         self,
         tag: str,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}/currentriverrace'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -262,12 +267,13 @@ class Client:
     def get_player(
         self,
         tag: str,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=models.FullPlayer,
@@ -279,12 +285,13 @@ class Client:
     def get_player_upcoming_chests(
         self,
         tag: str,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/upcomingchests'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
@@ -296,12 +303,13 @@ class Client:
     def get_player_battle_log(
         self,
         tag: str,
-        timeout: t.Optional[int] = None
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/battlelog'
         data, is_from_cache, timestamp = self._get_info_from_url(
-            method='GET', url=url, timeout=timeout, force_request=False
+            method='GET', url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
             model=None,
