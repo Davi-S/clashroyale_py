@@ -133,6 +133,10 @@ class Client:
     ### ENDPOINTS ###
     #################
     
+    ######################
+    ### CLAN ENDPOINTS ###
+    ######################
+    
     # TODO: add return types to the endpoints
     
     def get_clans(
@@ -240,6 +244,25 @@ class Client:
         data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
         return self._get_model(
             model=None,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+
+    #########################
+    ### PLAYERS ENDPOINTS ###
+    #########################
+    
+    def get_player(
+        self,
+        tag: str,
+        timeout: t.Optional[int] = None
+    ):
+        tag = utils.normalize_tag(tag)
+        url = f'{self.api.PLAYER}/{tag}'
+        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        return self._get_model(
+            model=models.FullPlayer,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
