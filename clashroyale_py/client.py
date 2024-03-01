@@ -266,7 +266,9 @@ class Client:
     ):
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}'
-        data, is_from_cache, timestamp = self._get_info_from_url('GET', url, timeout, None)
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            method='GET', url=url, timeout=timeout, force_request=False
+        )
         return self._get_model(
             model=models.FullPlayer,
             data=data,
