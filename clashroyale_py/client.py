@@ -6,7 +6,7 @@ import requests
 
 from . import cache, errors, models, utils
 
-# The content of the response to the url, if the content came from the cache, when was the response last updated
+# (The content of the response to the url), (if the content came from the cache), (when was the response last updated)
 type InfoFromURL = tuple[dict, bool, datetime]
 
 
