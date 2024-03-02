@@ -104,8 +104,6 @@ class Client:
     ### CLAN ENDPOINTS ###
     ######################
 
-    # TODO: add return types to the endpoints
-
     def get_clans(
         self,
         name: t.Optional[str] = None,
@@ -118,7 +116,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         params = {
             'name': name,
             'locationId': location_id,
@@ -149,7 +147,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         params = {
             'limit': limit,
@@ -173,7 +171,7 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
@@ -194,7 +192,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         params = {
             'limit': limit,
@@ -218,7 +216,7 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}/currentriverrace'
         data, is_from_cache, timestamp = self._get_info_from_url(
@@ -240,7 +238,7 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
@@ -258,7 +256,7 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/upcomingchests'
         data, is_from_cache, timestamp = self._get_info_from_url(
@@ -276,7 +274,7 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/battlelog'
         data, is_from_cache, timestamp = self._get_info_from_url(
@@ -303,7 +301,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         params = {
             'limit': limit,
             'after': after,
