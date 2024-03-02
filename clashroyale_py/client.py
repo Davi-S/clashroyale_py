@@ -91,10 +91,9 @@ class Client:
         is_from_cache: bool,
         timestamp: datetime
     ) -> models.ClashRoyaleModel:
-        # Check for the "items" key when the API returns a list
-        if 'items' in data:
-            data = data.pop('items')
-        return models.ClashRoyaleModel(data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
+        # Check for the "items" key: when the API returns a "list"
+        _data: dict | list = data.get('items', data)
+        return models.ClashRoyaleModel(_data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
 
     #################
     ### ENDPOINTS ###
