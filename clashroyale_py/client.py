@@ -375,7 +375,7 @@ class Client:
         )
 
     ###########################
-    ### TODO: LOCATIONS ENDPOINTS ###
+    ### LOCATIONS ENDPOINTS ###
     ###########################
 
     ############################
@@ -400,7 +400,6 @@ class Client:
             is_from_cache=is_from_cache,
             timestamp=timestamp
         )
-
 
     ####################################
     ### GLOBAL TOURNAMENTS ENDPOINTS ###
