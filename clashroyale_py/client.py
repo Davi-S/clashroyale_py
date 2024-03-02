@@ -354,3 +354,20 @@ class Client:
             timestamp=timestamp
         )
 
+    def get_tournament(
+        self,
+        tag: str,
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
+    ) -> models.ClashRoyaleBoxModel:
+        tag = utils.normalize_tag(tag)
+        url = f'{self.api.TOURNAMENT}/{tag}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            url=url, timeout=timeout, force_request=force_request
+        )
+        return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
