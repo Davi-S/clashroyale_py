@@ -18,6 +18,7 @@ class API:
     TOURNAMENT = BASE + '/tournaments'
     LOCATION = BASE + '/locations'
     CHALLENGE = BASE + '/challenges'
+    GLOBAL_TOURNAMENTS = BASE + '/globaltournaments'
 
 
 class Client:
@@ -393,6 +394,27 @@ class Client:
         # This endpoint return a list rather than a dict with "items" key and a list value.
         # Because of this, we make the dict to pass to the "_get_model" method
         data = {'items': data}
+        return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+
+
+    ####################################
+    ### GLOBAL TOURNAMENTS ENDPOINTS ###
+    ####################################
+
+    def get_global_tournaments(
+        self,
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
+    ) -> models.ClashRoyaleBoxListModel:
+        url = f'{self.api.GLOBAL_TOURNAMENTS}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            url=url, timeout=timeout, force_request=force_request
+        )
         return self._get_model(
             model_class=models.ClashRoyaleBoxListModel,
             data=data,
