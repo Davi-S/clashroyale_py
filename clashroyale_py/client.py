@@ -433,6 +433,33 @@ class Client:
             timestamp=timestamp
         )
 
+    def get_location_clan_war_rankings(
+        self,
+        location_id: str,
+        limit: t.Optional[int] = None,
+        after: t.Optional[str] = None,
+        before: t.Optional[str] = None,
+        timeout: t.Optional[int] = None,
+        force_request: bool = False
+    ) -> models.ClashRoyaleBoxListModel:
+        params = {
+            'locationId': location_id,
+            'limit': limit,
+            'after': after,
+            'before': before
+        }
+        params = utils.filter_none_values(params)
+        url = f'{self.api.LOCATION}/{location_id}/rankings/clanwars?{urlencode(params)}'
+        data, is_from_cache, timestamp = self._get_info_from_url(
+            url=url, timeout=timeout, force_request=force_request
+        )
+        return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
+            data=data,
+            is_from_cache=is_from_cache,
+            timestamp=timestamp
+        )
+
     ############################
     ### CHALLENGES ENDPOINTS ###
     ############################
