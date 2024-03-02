@@ -84,16 +84,17 @@ class Client:
 
         return data, is_from_cache, timestamp
 
-    def _get_model(
+    def _get_model[T: models.ClashRoyaleModel](
         self,
         *,
+        model_class: type[T],
         data: dict,
         is_from_cache: bool,
         timestamp: datetime
-    ) -> models.ClashRoyaleModel:
+    ) -> T:
         # Check for the "items" key: when the API returns a "list"
         _data: dict | list = data.get('items', data)
-        return models.ClashRoyaleModel(_data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
+        return model_class(_data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
 
     #################
     ### ENDPOINTS ###
@@ -102,8 +103,6 @@ class Client:
     ######################
     ### CLAN ENDPOINTS ###
     ######################
-
-    # TODO: add return types to the endpoints
 
     def get_clans(
         self,
@@ -117,7 +116,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         params = {
             'name': name,
             'locationId': location_id,
@@ -134,6 +133,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -147,7 +147,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         params = {
             'limit': limit,
@@ -160,6 +160,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -170,13 +171,14 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -190,7 +192,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         params = {
             'limit': limit,
@@ -203,6 +205,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -213,13 +216,14 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.CLAN}/{tag}/currentriverrace'
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -234,13 +238,14 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}'
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -251,13 +256,14 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/upcomingchests'
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -268,13 +274,17 @@ class Client:
         tag: str,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         tag = utils.normalize_tag(tag)
         url = f'{self.api.PLAYER}/{tag}/battlelog'
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
+        # This endpoint return a list rather than a dict with "items" key and a list value.
+        # Because of this, we make the dict to pass to the "_get_model" method
+        data = {'items': data}
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -291,7 +301,7 @@ class Client:
         before: t.Optional[str] = None,
         timeout: t.Optional[int] = None,
         force_request: bool = False
-    ):
+    ) -> models.ClashRoyaleBoxListModel:
         params = {
             'limit': limit,
             'after': after,
@@ -302,7 +312,12 @@ class Client:
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
+        # This endpoint has a "items" key. This makes the "_get_model" to use only its value as data.
+        # But this endpoint also has a "supportItems" key that is important.
+        # Because of this, we need to merge the two keys so the "items" key will have all the values
+        data = {'items': data['items'] + data['supportItems']}
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
