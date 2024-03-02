@@ -84,16 +84,17 @@ class Client:
 
         return data, is_from_cache, timestamp
 
-    def _get_model(
+    def _get_model[T: models.ClashRoyaleModel](
         self,
         *,
+        model_class: type[T],
         data: dict,
         is_from_cache: bool,
         timestamp: datetime
-    ) -> models.ClashRoyaleModel:
+    ) -> T:
         # Check for the "items" key: when the API returns a "list"
         _data: dict | list = data.get('items', data)
-        return models.ClashRoyaleModel(_data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
+        return model_class(_data, is_from_cache=is_from_cache, timestamp=timestamp, camel_killer_box=True)
 
     #################
     ### ENDPOINTS ###
@@ -134,6 +135,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -160,6 +162,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -177,6 +180,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -203,6 +207,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -220,6 +225,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -241,6 +247,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -258,6 +265,7 @@ class Client:
             url=url, timeout=timeout, force_request=force_request
         )
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -274,7 +282,11 @@ class Client:
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
+        # This endpoint return a list rather than a dict with "items" key and a list value.
+        # Because of this, we make the dict to pass to the "_get_model" method
+        data = {'items': data}
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
@@ -302,7 +314,12 @@ class Client:
         data, is_from_cache, timestamp = self._get_info_from_url(
             url=url, timeout=timeout, force_request=force_request
         )
+        # This endpoint has a "items" key. This makes the "_get_model" to use only its value as data.
+        # But this endpoint also has a "supportItems" key that is important.
+        # Because of this, we need to merge the two keys so the "items" key will have all the values
+        data = {'items': data['items'] + data['supportItems']}
         return self._get_model(
+            model_class=models.ClashRoyaleBoxListModel,
             data=data,
             is_from_cache=is_from_cache,
             timestamp=timestamp
