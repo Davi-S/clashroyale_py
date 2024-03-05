@@ -3,6 +3,7 @@ import json
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
+# TODO: Add cache custom errors and how/when the CacheStorage subclasses should raise them.
 
 class CacheStorage(abc.ABC):
     """
